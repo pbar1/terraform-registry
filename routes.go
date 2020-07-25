@@ -18,8 +18,7 @@ func NewServer() *fiber.App {
 
 	app.Get("/.well-known/terraform.json", serviceDiscovery)
 
-	v1modules := app.Group("/v1/modules")
-	v1modules.Get("/", listModules)
+	v1modules := app.Group("/v1/modules", listModules)
 	v1modules.Get("/search", searchModules)
 	v1modules.Get("/:namespace", listModules)
 	v1modules.Get("/:namespace/:name", listLatestModulesAllProviders)

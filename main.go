@@ -3,33 +3,21 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
+
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
-const (
-	helpMsg = `hcl2json
-
-Converts Hashicorp Configuration Langauge (HCL) to JavaScript Object Notation (JSON).
-Can also output YAML and TOML. If multiple output format command line flags and/or
-filename arguments are given, the rightmost wins. If no filename or - is given, reads
-from stdin.
+const helpMsg = `Terraform Registry API
 
 Usage:
-  hcl2json [FLAGS] [FILENAME]
-
-Examples:
-  Concatenate all Terraform files in a directory convert the result to JSON via stdin
-  > cat *.tf | hcl2json
-
-  Convert single HCL file to YAML
-  > hcl2json -y example.hcl
+  terraform-registry [FLAGS]
 
 Flags:
-  -h, --help      help for hcl2json
-  -v, --version   print program version
-  -j, --json      output JSON (default)
-  -y, --yaml      output YAML
-  -t, --toml      output TOML`
-)
+      --debug     set log level to debug
+  -h, --help      help for terraform-registry
+  -v, --version   print program version`
 
 var (
 	ver  string
@@ -37,15 +25,26 @@ var (
 )
 
 func main() {
-	server := NewServer()
-	server.Listen(port)
-}
-
-func check(err error, msg string) {
-	if err != nil {
-		if _, err := fmt.Fprintf(os.Stderr, "%s: %v\n", msg, err); err != nil {
-			panic(err)
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	for _, arg := range os.Args[1:] {
+		if arg == "-h" || arg == "--help" || arg == "-help" {
+			fmt.Println(helpMsg)
+			os.Exit(0)
 		}
-		os.Exit(1)
+		if arg == "-v" || arg == "--version" || arg == "-version" {
+			fmt.Println(ver)
+			os.Exit(0)
+		}
+		if arg == "--debug" || arg == "-debug" {
+			zerolog.SetGlobalLevel(zerolog.DebugLevel)
+			log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339}).
+				With().Caller().Logger()
+			log.Debug().Msg("log level set to debug")
+		}
+	}
+
+	server := NewServer()
+	if err := server.Listen(port); err != nil {
+		log.Fatal().Err(err)
 	}
 }

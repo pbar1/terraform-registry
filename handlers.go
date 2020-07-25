@@ -1,21 +1,30 @@
 package main
 
-import "github.com/gofiber/fiber"
+import (
+	"github.com/gofiber/fiber"
+	"github.com/rs/zerolog/log"
+)
 
 // https://www.terraform.io/docs/internals/remote-service-discovery.html#discovery-process
 func serviceDiscovery(c *fiber.Ctx) {
-	c.Status(fiber.StatusOK).Send(c.JSON(map[string]string{
-		"modules.v1": "/v1/modules/",
-	}))
+	if err := c.JSON(fiber.Map{"modules.v1": "/v1/modules/"}); err != nil {
+		log.Error().Err(err)
+		c.SendStatus(fiber.StatusInternalServerError)
+		return
+	}
 }
 
 // https://www.terraform.io/docs/registry/api.html#list-modules
 func listModules(c *fiber.Ctx) {
-	// namespace := c.Params("namespace")
+	namespace := c.Params("namespace")
 	var query listModulesQuery
 	if err := c.QueryParser(&query); err != nil {
 		c.SendStatus(fiber.StatusBadRequest)
 	}
+	log.Debug().Str("namespace", namespace).Interface("query", query).Send()
+
+	// TODO
+
 	c.SendStatus(fiber.StatusNotImplemented)
 }
 
@@ -25,6 +34,9 @@ func searchModules(c *fiber.Ctx) {
 	if err := c.QueryParser(&query); err != nil {
 		c.SendStatus(fiber.StatusBadRequest)
 	}
+
+	// TODO
+
 	c.SendStatus(fiber.StatusNotImplemented)
 }
 
@@ -34,6 +46,10 @@ func listVersionsForModule(c *fiber.Ctx) {
 	if namespace == "" || name == "" || provider == "" {
 		c.SendStatus(fiber.StatusBadRequest)
 	}
+	log.Debug().Str("namespace", namespace).Str("name", name).Str("provider", provider)
+
+	// TODO
+
 	c.SendStatus(fiber.StatusNotImplemented)
 }
 
@@ -43,7 +59,11 @@ func downloadSourceForModule(c *fiber.Ctx) {
 	if namespace == "" || name == "" || provider == "" || version == "" {
 		c.SendStatus(fiber.StatusBadRequest)
 	}
+	log.Debug().Str("namespace", namespace).Str("name", name).Str("provider", provider).Str("version", version)
+
+	// TODO
 	c.Set("X-Terraform-Get", "TODO")
+
 	c.SendStatus(fiber.StatusNotImplemented)
 }
 
@@ -57,6 +77,10 @@ func listLatestModulesAllProviders(c *fiber.Ctx) {
 	if err := c.QueryParser(&query); err != nil {
 		c.SendStatus(fiber.StatusBadRequest)
 	}
+	log.Debug().Str("namespace", namespace).Str("name", name).Interface("query", query)
+
+	// TODO
+
 	c.SendStatus(fiber.StatusNotImplemented)
 }
 
@@ -66,6 +90,10 @@ func listLatestModuleForProvider(c *fiber.Ctx) {
 	if namespace == "" || name == "" || provider == "" {
 		c.SendStatus(fiber.StatusBadRequest)
 	}
+	log.Debug().Str("namespace", namespace).Str("name", name).Str("provider", provider)
+
+	// TODO
+
 	c.SendStatus(fiber.StatusNotImplemented)
 }
 
@@ -75,6 +103,10 @@ func getSpecificModule(c *fiber.Ctx) {
 	if namespace == "" || name == "" || provider == "" || version == "" {
 		c.SendStatus(fiber.StatusBadRequest)
 	}
+	log.Debug().Str("namespace", namespace).Str("name", name).Str("provider", provider).Str("version", version)
+
+	// TODO
+
 	c.SendStatus(fiber.StatusNotImplemented)
 }
 
@@ -84,5 +116,9 @@ func downloadLatestModule(c *fiber.Ctx) {
 	if namespace == "" || name == "" || provider == "" {
 		c.SendStatus(fiber.StatusBadRequest)
 	}
+	log.Debug().Str("namespace", namespace).Str("name", name).Str("provider", provider)
+
+	// TODO
+
 	c.SendStatus(fiber.StatusNotImplemented)
 }
