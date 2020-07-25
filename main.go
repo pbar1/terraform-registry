@@ -20,8 +20,10 @@ Flags:
   -v, --version   print program version`
 
 var (
-	ver  string
-	port = 8080
+	ver                   string
+	port                  = 8080
+	backend               Backend
+	moduleArchiveFilename = "module.tar.gz"
 )
 
 func main() {
@@ -42,6 +44,8 @@ func main() {
 			log.Debug().Msg("log level set to debug")
 		}
 	}
+
+	backend = NewFilesystemBackend(".", moduleArchiveFilename)
 
 	server := NewServer()
 	if err := server.Listen(port); err != nil {
